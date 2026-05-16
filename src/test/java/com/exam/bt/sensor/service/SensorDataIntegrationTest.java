@@ -1,4 +1,4 @@
-package com.exam.bt.sensor;
+package com.exam.bt.sensor.service;
 
 import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
 import static org.assertj.core.api.Assertions.assertThat;

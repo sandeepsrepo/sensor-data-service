@@ -1,23 +1,23 @@
 package com.exam.bt.sensor.config;
 
 import com.exam.bt.sensor.service.UdpMessageHandler;
-import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.handler.ReactiveMessageHandlerAdapter;
-import org.springframework.integration.ip.udp.UnicastReceivingChannelAdapter;
-import org.springframework.messaging.Message;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.netty.Connection;
+import reactor.netty.udp.UdpServer;
 
+@Slf4j
 @Component
 public class UdpFlowFactory {
 
-  public IntegrationFlow create(int port, UdpMessageHandler handler) {
-
-    UnicastReceivingChannelAdapter adapter = new UnicastReceivingChannelAdapter(port);
-
-    return IntegrationFlow.from(adapter)
-        .channel(c -> c.flux())
-        .handle(
-            new ReactiveMessageHandlerAdapter(msg -> handler.processMessage((Message<byte[]>) msg)))
-        .get();
+  public Connection create(int port, UdpMessageHandler handler) {
+    Connection connection =
+        UdpServer.create()
+            .host("0.0.0.0")
+            .port(port)
+            .handle((in, out) -> in.receive().asByteArray().flatMap(handler::processMessage).then())
+            .bindNow();
+    log.info("UDP server started and listening on port {}", port);
+    return connection;
   }
 }
