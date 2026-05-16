@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: sensor-data-service
+
+sensors:
+  udp:
+    ports:
+      - 3344
+      - 3355
+  kafka:
+    bootstrap-servers: localhost:9092
+    topic: sensor-topic
+
+logging:
+  level:
+    org.apache.kafka: WARN
